@@ -17,6 +17,7 @@ class Main extends React.Component {
   handleAddUser = async () => {
     const { newUser, users } = this.state;
 
+    console.tron.log('chamada', newUser);
     const response = await api.get(`/users/${newUser}`);
 
     const userDate = {
