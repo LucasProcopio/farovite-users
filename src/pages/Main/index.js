@@ -1,9 +1,23 @@
 import React from 'react';
+import { Keyboard, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import api from '../../services/api';
 
-import { Container, Form, Input, SubmitButton } from './styles';
+import {
+  Container,
+  Form,
+  Input,
+  SubmitButton,
+  List,
+  User,
+  Avatar,
+  Name,
+  Bio,
+  ProfileButton,
+  ProfileButtonText,
+} from './styles';
 
 class Main extends React.Component {
   constructor(props) {
@@ -11,11 +25,30 @@ class Main extends React.Component {
     this.state = {
       newUser: '',
       users: [],
+      loading: false,
     };
+  }
+
+  async componentDidMount() {
+    console.tron.log(this.props);
+    const users = await AsyncStorage.getItem('users');
+
+    if (users) {
+      this.setState({ users: JSON.parse(users) });
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    const { users } = this.state;
+
+    if (prevState.users !== users) {
+      AsyncStorage.setItem('users', JSON.stringify(users));
+    }
   }
 
   handleAddUser = async () => {
     const { newUser, users } = this.state;
+    this.setState({ loading: true });
 
     console.tron.log('chamada', newUser);
     const response = await api.get(`/users/${newUser}`);
@@ -30,11 +63,14 @@ class Main extends React.Component {
     this.setState({
       users: [...users, userDate],
       newUser: '',
+      loading: false,
     });
+
+    Keyboard.dismiss();
   };
 
   render() {
-    const { newUser } = this.state;
+    const { newUser, users, loading } = this.state;
     return (
       <Container>
         <Form>
@@ -47,10 +83,29 @@ class Main extends React.Component {
             returnKeyType="send"
             onSubmitEditing={this.handleAddUser}
           />
-          <SubmitButton onPress={this.handleAddUser}>
-            <Icon name="add" size={20} color="#fff" />
+          <SubmitButton loading={loading} onPress={this.handleAddUser}>
+            {loading ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
+              <Icon name="add" size={20} color="#fff" />
+            )}
           </SubmitButton>
         </Form>
+        <List
+          data={users}
+          keyExtractor={user => user.login}
+          renderItem={({ item }) => (
+            <User>
+              <Avatar source={{ uri: item.avatar }} />
+              <Name>{item.name}</Name>
+              <Bio>{item.bio}</Bio>
+
+              <ProfileButton onPress={() => {}}>
+                <ProfileButtonText>See Profile</ProfileButtonText>
+              </ProfileButton>
+            </User>
+          )}
+        />
       </Container>
     );
   }
