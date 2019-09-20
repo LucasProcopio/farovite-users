@@ -28,6 +28,7 @@ class User extends React.Component {
     this.state = {
       stars: [],
       loading: false,
+      page: 1,
     };
   }
 
@@ -43,6 +44,24 @@ class User extends React.Component {
       console.tron.log(err);
     }
   }
+
+  loadMore = async () => {
+    const { page, stars } = this.state;
+    const { navigation } = this.props;
+    const user = navigation.getParam('userData');
+
+    const currentPage = page + 1;
+    this.setState({ loading: true, page: page + 1 });
+    try {
+      const response = await api.get(`/users/${user.login}/starred`, {
+        params: { page: currentPage },
+      });
+
+      this.setState({ stars: [...stars, ...response.data], loading: false });
+    } catch (err) {
+      console.tron.log(err);
+    }
+  };
 
   render() {
     const { navigation } = this.props;
@@ -64,6 +83,8 @@ class User extends React.Component {
         ) : (
           <Stars
             data={stars}
+            onEndReachedThreshold={0.3}
+            onEndReached={this.loadMore}
             keyExtractor={star => star.id.toString()}
             renderItem={({ item }) => (
               <Starred>
