@@ -1,5 +1,6 @@
 import React from 'react';
 import { Keyboard, ActivityIndicator } from 'react-native';
+import { PropTypes } from 'prop-types';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -20,6 +21,10 @@ import {
 } from './styles';
 
 class Main extends React.Component {
+  static navigationOptions = {
+    title: 'Users',
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -30,7 +35,6 @@ class Main extends React.Component {
   }
 
   async componentDidMount() {
-    console.tron.log(this.props);
     const users = await AsyncStorage.getItem('users');
 
     if (users) {
@@ -50,7 +54,6 @@ class Main extends React.Component {
     const { newUser, users } = this.state;
     this.setState({ loading: true });
 
-    console.tron.log('chamada', newUser);
     const response = await api.get(`/users/${newUser}`);
 
     const userDate = {
@@ -67,6 +70,11 @@ class Main extends React.Component {
     });
 
     Keyboard.dismiss();
+  };
+
+  handleNavigate = userData => {
+    const { navigation } = this.props;
+    navigation.navigate('User', { userData });
   };
 
   render() {
@@ -100,7 +108,7 @@ class Main extends React.Component {
               <Name>{item.name}</Name>
               <Bio>{item.bio}</Bio>
 
-              <ProfileButton onPress={() => {}}>
+              <ProfileButton onPress={() => this.handleNavigate(item)}>
                 <ProfileButtonText>See Profile</ProfileButtonText>
               </ProfileButton>
             </User>
@@ -111,8 +119,10 @@ class Main extends React.Component {
   }
 }
 
-Main.navigationOptions = {
-  title: 'Users',
+Main.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func,
+  }).isRequired,
 };
 
 export default Main;
