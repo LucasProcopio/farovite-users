@@ -75,3 +75,10 @@ export const Info = styled.View`
   color: #666;
   margin-top: 2px;
 `;
+
+export const LoadIndicator = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding-top: ${props => (props.bottomIndicator === 'true' ? '20px' : '0px')};
+`;
