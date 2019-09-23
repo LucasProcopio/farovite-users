@@ -10,6 +10,12 @@
 
 > A study pourpose React native application
 
+<p style="text-align: center">
+  <img alt="App Preview" src="public/fav_usrs.gif" width="360"/>
+</p>
+
+---
+
 ## Install
 
 * To install and use this application follow the React native get started [documentation](https://facebook.github.io/react-native/docs/getting-started)

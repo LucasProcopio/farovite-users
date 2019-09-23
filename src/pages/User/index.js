@@ -85,6 +85,11 @@ class User extends React.Component {
     }
   };
 
+  handleNavigate = repo => {
+    const { navigation } = this.props;
+    navigation.navigate('Repository', { repo });
+  };
+
   render() {
     const { navigation } = this.props;
     const { stars, loading, loadMore, endReached, refreshing } = this.state;
@@ -111,7 +116,7 @@ class User extends React.Component {
             refreshing={refreshing}
             keyExtractor={star => star.id.toString()}
             renderItem={({ item }) => (
-              <Starred>
+              <Starred onPress={() => this.handleNavigate(item)}>
                 <OwnerAvatar source={{ uri: item.owner.avatar_url }} />
                 <Info>
                   <Title>{item.name}</Title>
@@ -135,6 +140,7 @@ class User extends React.Component {
 User.propTypes = {
   navigation: PropTypes.shape({
     getParam: PropTypes.func,
+    navigate: PropTypes.func,
   }).isRequired,
 };
 
