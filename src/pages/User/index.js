@@ -30,6 +30,7 @@ class User extends React.Component {
       loading: false,
       loadMore: false,
       endReached: 0.2,
+      refreshing: false,
       page: 1,
     };
   }
@@ -69,9 +70,24 @@ class User extends React.Component {
     }
   };
 
+  reefreshList = async () => {
+    this.setState({ refreshing: true });
+
+    const { navigation } = this.props;
+    const user = navigation.getParam('userData');
+
+    try {
+      const response = await api.get(`/users/${user.login}/starred`);
+
+      this.setState({ stars: response.data, refreshing: false, page: 1 });
+    } catch (err) {
+      console.tron.log(err);
+    }
+  };
+
   render() {
     const { navigation } = this.props;
-    const { stars, loading, loadMore, endReached } = this.state;
+    const { stars, loading, loadMore, endReached, refreshing } = this.state;
     const user = navigation.getParam('userData');
 
     return (
@@ -82,7 +98,7 @@ class User extends React.Component {
           <Bio>{user.bio}</Bio>
         </Header>
 
-        {loading ? (
+        {loading || refreshing ? (
           <LoadIndicator>
             <ActivityIndicator color="#7159c1" size={50} />
           </LoadIndicator>
@@ -91,6 +107,8 @@ class User extends React.Component {
             data={stars}
             onEndReachedThreshold={endReached}
             onEndReached={this.loadMore}
+            onRefresh={this.reefreshList}
+            refreshing={refreshing}
             keyExtractor={star => star.id.toString()}
             renderItem={({ item }) => (
               <Starred>
