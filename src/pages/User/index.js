@@ -28,6 +28,8 @@ class User extends React.Component {
     this.state = {
       stars: [],
       loading: false,
+      loadMore: false,
+      endReached: 0.2,
       page: 1,
     };
   }
@@ -51,13 +53,17 @@ class User extends React.Component {
     const user = navigation.getParam('userData');
 
     const currentPage = page + 1;
-    this.setState({ loading: true, page: page + 1 });
+    this.setState({ loadMore: true, page: page + 1 });
     try {
       const response = await api.get(`/users/${user.login}/starred`, {
         params: { page: currentPage },
       });
 
-      this.setState({ stars: [...stars, ...response.data], loading: false });
+      if (response.data.length !== 0) {
+        this.setState({ stars: [...stars, ...response.data], loadMore: false });
+      } else {
+        this.setState({ loadMore: false, endReached: 0 });
+      }
     } catch (err) {
       console.tron.log(err);
     }
@@ -65,7 +71,7 @@ class User extends React.Component {
 
   render() {
     const { navigation } = this.props;
-    const { stars, loading } = this.state;
+    const { stars, loading, loadMore, endReached } = this.state;
     const user = navigation.getParam('userData');
 
     return (
@@ -83,7 +89,7 @@ class User extends React.Component {
         ) : (
           <Stars
             data={stars}
-            onEndReachedThreshold={0.3}
+            onEndReachedThreshold={endReached}
             onEndReached={this.loadMore}
             keyExtractor={star => star.id.toString()}
             renderItem={({ item }) => (
@@ -96,6 +102,12 @@ class User extends React.Component {
               </Starred>
             )}
           />
+        )}
+
+        {loadMore && (
+          <LoadIndicator bottomIndicator="true">
+            <ActivityIndicator color="#7159c1" size={30} />
+          </LoadIndicator>
         )}
       </Container>
     );
