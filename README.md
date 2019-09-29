@@ -10,8 +10,8 @@
 
 > A study pourpose React native application
 
-<p style="text-align: center">
-  <img alt="App Preview" src="public/fav_usrs.gif" width="360"/>
+<p align="center">
+  <img alt="App Preview" src="public/fav_usrs.gif" alt="App preview"/>
 </p>
 
 ---
